@@ -1,7 +1,7 @@
 #samuelaye03
 
 #my favorite quotes
-> "It always seens impossible until it's done - Nelson Mandela"
+> "It always seems impossible until it's done - Nelson Mandela"
 
 > "The only way to do great work is to love what you do - Steve Jobs"
 

@@ -1,0 +1,1 @@
+Hello! I'm excited to work on this project! I want to learn a lot, work as a team and gain confidence! Thanks for the opportunity. 

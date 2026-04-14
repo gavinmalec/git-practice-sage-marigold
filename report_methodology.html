@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>How We Built the Kenya SME Tech Report</title>
+  <style>
+    :root {
+      --primary: #1a3c5e;
+      --accent: #e8a020;
+      --light: #f4f7fb;
+      --text: #1e2d3d;
+      --muted: #6b7a8d;
+      --border: #dce3ed;
+      --green: #1a7f4b;
+      --white: #ffffff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* COVER */
+    .cover {
+      background: linear-gradient(135deg, #0f2740 0%, #1a3c5e 55%, #1a5e3a 100%);
+      color: white;
+      padding: 70px 60px 56px;
+      position: relative;
+      overflow: hidden;
+    }
+    .cover::before {
+      content: '';
+      position: absolute;
+      top: -80px; right: -60px;
+      width: 380px; height: 380px;
+      border-radius: 50%;
+      background: rgba(232,160,32,0.1);
+    }
+    .cover-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #111;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 3px;
+      margin-bottom: 22px;
+    }
+    .cover h1 {
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.15;
+      max-width: 640px;
+      margin-bottom: 14px;
+    }
+    .cover h1 span { color: var(--accent); }
+    .cover p {
+      font-size: 15px;
+      opacity: 0.72;
+      max-width: 500px;
+      margin-bottom: 38px;
+    }
+    .cover-meta { display: flex; gap: 36px; flex-wrap: wrap; }
+    .cover-meta-item label {
+      display: block;
+      font-size: 10px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.5;
+      margin-bottom: 3px;
+    }
+    .cover-meta-item span { font-size: 14px; font-weight: 600; }
+
+    /* LAYOUT */
+    .container { max-width: 960px; margin: 0 auto; padding: 52px 40px; }
+
+    /* STEP TIMELINE */
+    .timeline { position: relative; padding-left: 50px; margin-bottom: 48px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 17px; top: 0; bottom: 0;
+      width: 2px;
+      background: var(--border);
+    }
+    .step { position: relative; margin-bottom: 40px; }
+    .step:last-child { margin-bottom: 0; }
+    .step-dot {
+      position: absolute;
+      left: -50px;
+      top: 2px;
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      border: 3px solid var(--light);
+      z-index: 1;
+    }
+    .step-dot.accent { background: var(--accent); color: #111; }
+    .step-dot.green { background: var(--green); }
+    .step-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .step h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .step p { font-size: 13.5px; color: var(--muted); margin-bottom: 12px; line-height: 1.75; }
+    .step-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: 10px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--text);
+      margin-top: 12px;
+    }
+    .step-card.blue { border-left-color: var(--primary); }
+    .step-card.green { border-left-color: var(--green); }
+    .step-card strong { color: var(--primary); }
+
+    /* SECTION HEADERS */
+    .section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 28px; margin-top: 52px;
+    }
+    .section-header:first-child { margin-top: 0; }
+    .section-number {
+      background: var(--primary);
+      color: white;
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      flex-shrink: 0;
+    }
+    .section-header h2 { font-size: 21px; font-weight: 700; color: var(--primary); }
+    .section-header .tag {
+      margin-left: auto;
+      background: #e6f0fa;
+      color: var(--primary);
+      font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+    }
+
+    /* SOURCE CARDS */
+    .source-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .source-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .source-icon { font-size: 22px; margin-bottom: 8px; }
+    .source-name { font-size: 13px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
+    .source-type { font-size: 11px; color: var(--muted); }
+
+    /* TOOL CARDS */
+    .tool-list {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .tool-row {
+      display: grid;
+      grid-template-columns: 40px 1fr 2fr;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      align-items: center;
+      gap: 16px;
+      font-size: 13px;
+    }
+    .tool-row:last-child { border-bottom: none; }
+    .tool-row.header {
+      background: var(--primary);
+      color: white;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+    .tool-row:hover:not(.header) { background: #f8fafd; }
+    .tool-emoji { font-size: 18px; }
+    .tool-name { font-weight: 600; color: var(--primary); }
+    .tool-desc { color: var(--muted); line-height: 1.5; }
+
+    /* DECISION BOXES */
+    .decision-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+    .decision-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px 20px;
+    }
+    .decision-q {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .decision-a {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.65;
+    }
+
+    /* QUOTE */
+    .quote-block {
+      background: var(--primary);
+      color: white;
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 32px;
+      position: relative;
+    }
+    .quote-block::before {
+      content: '\201C';
+      position: absolute;
+      top: 10px; left: 24px;
+      font-size: 60px;
+      opacity: 0.2;
+      line-height: 1;
+    }
+    .quote-block p {
+      font-size: 15px;
+      line-height: 1.8;
+      opacity: 0.9;
+      margin-bottom: 14px;
+    }
+    .quote-block cite { font-size: 12px; opacity: 0.55; }
+
+    /* DIVIDER */
+    .divider { height: 1px; background: var(--border); margin: 40px 0; }
+
+    /* FOOTER */
+    .footer {
+      background: var(--primary);
+      color: rgba(255,255,255,0.65);
+      padding: 28px 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .footer strong { color: white; }
+
+    @media print {
+      .cover, .tool-row.header, .quote-block, .footer {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- COVER -->
+<div class="cover">
+  <div class="cover-tag">Methodology Document</div>
+  <h1>How We Built the<br><span>Kenya SME Tech Report</span></h1>
+  <p>A transparent walkthrough of the research process, data sourcing, analytical framework, and design decisions behind the 2025–2026 Kenya SME Technology Landscape Report.</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item"><label>Document Type</label><span>Process Walkthrough</span></div>
+    <div class="cover-meta-item"><label>Relates To</label><span>Kenya SME Tech Report</span></div>
+    <div class="cover-meta-item"><label>Prepared</label><span>April 2026</span></div>
+    <div class="cover-meta-item"><label>Audience</label><span>Client / Internal</span></div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SECTION 1: OVERVIEW -->
+  <div class="section-header">
+    <div class="section-number">01</div>
+    <h2>The Brief</h2>
+    <span class="tag">Starting Point</span>
+  </div>
+
+  <div class="quote-block">
+    <p>The request was simple but open-ended: <strong>"Scrape the internet and compile an executive summary for small SMEs tech in Kenya."</strong> No template. No prescribed length. No fixed data sources. The challenge was to produce something both analytically rigorous and immediately useful to a client — in a single pass.</p>
+    <cite>— Original user brief, April 2026</cite>
+  </div>
+
+  <div class="decision-grid">
+    <div class="decision-card">
+      <div class="decision-q">What did we interpret?</div>
+      <div class="decision-a">An executive-level intelligence report covering the state of technology adoption among Kenyan SMEs — market data, platforms, government policy, challenges, and growth opportunities.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">Who is the audience?</div>
+      <div class="decision-a">Business decision-makers, investors, or consultants who need a fast, data-backed view of Kenya's SME tech landscape without spending days doing primary research.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">What outcome was expected?</div>
+      <div class="decision-a">A structured summary that could be shared directly with a client — not a rough draft, but a polished, credible document with clear sections and cited sources.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">What format was chosen?</div>
+      <div class="decision-a">An interactive HTML document — chosen because it renders charts natively, works in any browser, can be printed to PDF, and is shareable via a URL without needing specialist software.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 2: RESEARCH PROCESS -->
+  <div class="section-header">
+    <div class="section-number">02</div>
+    <h2>Research Process</h2>
+    <span class="tag">Step by Step</span>
+  </div>
+
+  <div class="timeline">
+
+    <div class="step">
+      <div class="step-dot">1</div>
+      <div class="step-tag">Step 1 — Query Design</div>
+      <h3>Defining What to Search For</h3>
+      <p>Before hitting a single search engine, the research scope was mapped out across six domains to ensure complete coverage and avoid gaps:</p>
+      <div class="step-card">
+        <strong>Six research domains defined upfront:</strong><br><br>
+        1. Current state of SME tech adoption (baseline data)<br>
+        2. Key challenges SMEs face with technology<br>
+        3. Popular tools and platforms used by Kenyan SMEs<br>
+        4. Government initiatives and policies<br>
+        5. Notable fintech, e-commerce, and SaaS solutions<br>
+        6. Key statistics, market size, and growth trends
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">2</div>
+      <div class="step-tag">Step 2 — Web Research</div>
+      <h3>Multi-Source Intelligence Gathering</h3>
+      <p>A research agent performed structured web searches across authoritative sources simultaneously — prioritising primary data (government reports, World Bank, market research firms) over secondary aggregators. Over <strong>20 distinct sources</strong> were consulted in a single research pass.</p>
+      <div class="step-card blue">
+        <strong>Source prioritisation criteria:</strong><br><br>
+        • <strong>Primary authority</strong> — Government bodies (ICT Authority Kenya, KIPPRA, MSME Directorate)<br>
+        • <strong>Financial credibility</strong> — World Bank, IMF, development finance institutions<br>
+        • <strong>Market data firms</strong> — Mordor Intelligence, Statista, GlobeNewswire<br>
+        • <strong>Industry media</strong> — TechCabal, Techish Kenya, Tech in Africa<br>
+        • <strong>Trade intelligence</strong> — U.S. International Trade Administration<br>
+        • <strong>Academic / policy</strong> — ResearchGate, GSMA, Bowmans Law
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot accent">3</div>
+      <div class="step-tag">Step 3 — Data Extraction</div>
+      <h3>Pulling Hard Numbers</h3>
+      <p>Each source was scanned for quantifiable data points — percentages, market sizes, CAGR figures, funding amounts, and policy commitments. Vague claims without citation were excluded. Where sources conflicted, the most recent and most authoritative figure was used.</p>
+      <div class="step-card">
+        <strong>Key data points extracted and verified:</strong><br><br>
+        • SME share of businesses: <strong>98%</strong> — Kenya News Agency / KIPPRA<br>
+        • SME GDP contribution: <strong>33.8%</strong> — multiple corroborated sources<br>
+        • Digital payment adoption: <strong>91%</strong> — Kenya News Agency (2025)<br>
+        • Startup funding: <strong>$638M in 2024</strong> — TechCabal Insights<br>
+        • ICT market size: <strong>$11.81B (2026)</strong> — Mordor Intelligence<br>
+        • E-commerce CAGR: <strong>13%</strong> — Softlink Options / market research<br>
+        • BNPL market projection: <strong>$16.8B by 2029</strong> — GlobeNewswire<br>
+        • KDEAP investment: <strong>$390M</strong> — World Bank / U.S. ITA
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot green">4</div>
+      <div class="step-tag">Step 4 — Synthesis</div>
+      <h3>Turning Raw Data into Narrative</h3>
+      <p>Raw facts were organised into a coherent analytical narrative. This involved identifying the story the data tells — not just listing statistics, but connecting them into a picture of where Kenya's SME tech sector is, where it's going, and what's driving or blocking progress.</p>
+      <div class="step-card green">
+        <strong>The central thesis that emerged:</strong><br><br>
+        Kenya's SME technology landscape is at a <em>structural inflection point</em>. Mobile infrastructure (M-Pesa), government policy alignment (AI Strategy, KDEAP), and investor confidence ($638M in 2024) are converging. The primary remaining gap — and largest opportunity — is the last mile: rural connectivity, affordable micro-enterprise tooling, and digital literacy at scale.
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-dot">5</div>
+      <div class="step-tag">Step 5 — Structure Design</div>
+      <h3>Organising for Executive Readability</h3>
+      <p>The report was structured to serve a time-pressed executive reader. The architecture follows a pyramid principle: key numbers first, then context, then detail.</p>
+      <div class="step-card blue">
+        <strong>Eight-section architecture chosen:</strong><br><br>
+        1. Market Performance Snapshot (KPIs) — headline numbers at a glance<br>
+        2. Analytics &amp; Growth Trends — visual data via charts<br>
+        3. Platform &amp; Solutions Performance — competitive landscape table<br>
+        4. Barriers &amp; Risk Assessment — structured risk matrix<br>
+        5. Government &amp; Policy Enablers — policy landscape cards<br>
+        6. Strategic Opportunities — ranked priority scorecard<br>
+        7. Market Sizing Summary — financial projections table<br>
+        8. Conclusion &amp; Recommendations — actionable next steps
+      </div>
+    </div>
+
+  </div>
+
+  <!-- SECTION 3: TOOLS USED -->
+  <div class="section-header">
+    <div class="section-number">03</div>
+    <h2>Tools &amp; Technology Used</h2>
+    <span class="tag">Stack</span>
+  </div>
+
+  <div class="tool-list">
+    <div class="tool-row header">
+      <div></div>
+      <div>Tool</div>
+      <div>Purpose</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-emoji">🔍</div>
+      <div class="tool-name">Web Research Agent</div>
+      <div class="tool-desc">Autonomous multi-source web scraping and intelligence gathering across 20+ primary sources simultaneously</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-emoji">📊</div>
+      <div class="tool-name">Chart.js v4.5</div>
+      <div class="tool-desc">Interactive data visualisations: line, bar, doughnut, and radar charts — fully rendered in-browser, no plugins needed</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-emoji">🌐</div>
+      <div class="tool-name">HTML5 / CSS3</div>
+      <div class="tool-desc">Single-file, self-contained client document with no dependencies — works in any modern browser, printable to PDF</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-emoji">🔗</div>
+      <div class="tool-name">GitHub Pages</div>
+      <div class="tool-desc">Zero-cost public hosting via git push — report accessible from any device via a permanent public URL</div>
+    </div>
+    <div class="tool-row">
+      <div class="tool-emoji">🤖</div>
+      <div class="tool-name">Claude AI (Sonnet 4.6)</div>
+      <div class="tool-desc">Research synthesis, analytical framing, document architecture, HTML/CSS generation, and iterative refinement</div>
+    </div>
+  </div>
+
+  <!-- SECTION 4: DESIGN DECISIONS -->
+  <div class="section-header">
+    <div class="section-number">04</div>
+    <h2>Design Decisions Explained</h2>
+    <span class="tag">Rationale</span>
+  </div>
+
+  <div class="decision-grid">
+    <div class="decision-card">
+      <div class="decision-q">Why HTML instead of PDF or Word?</div>
+      <div class="decision-a">HTML renders interactive charts natively, loads instantly in any browser, requires no software to open, and can be hosted as a live URL. It also prints cleanly to PDF when needed — best of both worlds.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">Why inline Chart.js?</div>
+      <div class="decision-a">To make the file fully self-contained. A CDN-linked chart library fails when there's no internet. Inlining the library (~200KB) ensures charts render offline, on any computer, with no dependencies.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">Why a radar chart for adoption?</div>
+      <div class="decision-a">Radar charts are ideal for comparing multiple categories across two groups simultaneously — perfect for visualising urban vs rural SME digital adoption across 7 technology categories at a glance.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">Why a horizontal bar for CAGR?</div>
+      <div class="decision-a">CAGR values vary widely (5.6% to 52%). A horizontal bar layout with long labels reads more naturally than vertical bars, and the length of each bar makes the relative magnitude immediately clear.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">Why the navy + amber colour palette?</div>
+      <div class="decision-a">Navy (#1a3c5e) signals authority and trust — appropriate for a financial/market report. Amber (#e8a020) provides warmth and draws attention to key highlights. Together they meet accessibility contrast standards.</div>
+    </div>
+    <div class="decision-card">
+      <div class="decision-q">Why publish on GitHub Pages?</div>
+      <div class="decision-a">It's free, permanent, requires no account from the viewer, and uses an existing git repository. The URL is clean and professional. No file attachments, no expiry dates, no login walls.</div>
+    </div>
+  </div>
+
+  <!-- SECTION 5: SOURCES -->
+  <div class="section-header">
+    <div class="section-number">05</div>
+    <h2>Data Sources</h2>
+    <span class="tag">References</span>
+  </div>
+
+  <div class="source-grid">
+    <div class="source-card">
+      <div class="source-icon">🏛️</div>
+      <div class="source-name">ICT Authority Kenya</div>
+      <div class="source-type">Government — AI Strategy 2025–2030</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">🌍</div>
+      <div class="source-name">World Bank</div>
+      <div class="source-type">Development — KDEAP $390M program</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">📡</div>
+      <div class="source-name">GSMA</div>
+      <div class="source-type">Telecom — Kenya Digital Economy Report</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">📰</div>
+      <div class="source-name">TechCabal Insights</div>
+      <div class="source-type">Media — Kenya Digital Economy 2025</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">📊</div>
+      <div class="source-name">Mordor Intelligence</div>
+      <div class="source-type">Market Research — Kenya ICT Market</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">📈</div>
+      <div class="source-name">Statista</div>
+      <div class="source-type">Data — SaaS Kenya Forecast</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">🏦</div>
+      <div class="source-name">Kenya News Agency</div>
+      <div class="source-type">Government — SME digital payment data</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">🔬</div>
+      <div class="source-name">KIPPRA</div>
+      <div class="source-type">Policy — Digital needs for MSMEs</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">🏢</div>
+      <div class="source-name">U.S. ITA</div>
+      <div class="source-type">Trade — Kenya Digital Economy guide</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">⚖️</div>
+      <div class="source-name">Bowmans Law</div>
+      <div class="source-type">Legal — Kenya AI Strategy analysis</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">💹</div>
+      <div class="source-name">GlobeNewswire</div>
+      <div class="source-type">Market — Africa BNPL $16.8B forecast</div>
+    </div>
+    <div class="source-card">
+      <div class="source-icon">🧪</div>
+      <div class="source-name">ResearchGate</div>
+      <div class="source-type">Academic — SME digital competitiveness</div>
+    </div>
+  </div>
+
+  <!-- SECTION 6: QUALITY CHECKS -->
+  <div class="section-header">
+    <div class="section-number">06</div>
+    <h2>Quality &amp; Accuracy Standards</h2>
+    <span class="tag">Integrity</span>
+  </div>
+
+  <div class="timeline">
+    <div class="step">
+      <div class="step-dot green">✓</div>
+      <div class="step-tag">Check 1</div>
+      <h3>Source Corroboration</h3>
+      <p>Every headline statistic (98% SME share, 91% digital payment adoption, $638M funding) was verified against at least two independent sources before inclusion. Single-source claims are flagged with "est." in the report.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot green">✓</div>
+      <div class="step-tag">Check 2</div>
+      <h3>Recency Filter</h3>
+      <p>All data points reference 2024–2026 publications. Older figures were excluded unless no newer equivalent existed. This ensures the report reflects current market conditions, not historical state.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot green">✓</div>
+      <div class="step-tag">Check 3</div>
+      <h3>Internal Consistency</h3>
+      <p>Chart data was cross-checked against table data to ensure no contradictions between the visual and written representations of the same figures. CAGR projections were independently validated against base year and projection year values.</p>
+    </div>
+    <div class="step">
+      <div class="step-dot green">✓</div>
+      <div class="step-tag">Check 4</div>
+      <h3>Offline Verification</h3>
+      <p>The final HTML file was tested for full offline functionality — all charts, styles, and layouts confirmed to render correctly with no internet connection, on a fresh browser profile with no cached CDN assets.</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- CONCLUSION -->
+  <div class="section-header">
+    <div class="section-number">07</div>
+    <h2>Summary</h2>
+    <span class="tag">Closing Note</span>
+  </div>
+
+  <div style="background:white;border-radius:12px;padding:28px 32px;border:1px solid var(--border);border-left:4px solid var(--accent);margin-bottom:40px;">
+    <p style="font-size:14px;line-height:1.85;color:var(--text);">
+      The Kenya SME Technology Report was produced in a single research-to-delivery cycle using an AI-assisted research and synthesis workflow. Starting from a plain-language brief, the process moved through structured query design, multi-source web research, quantitative data extraction, narrative synthesis, information architecture, and client-ready visual design — culminating in a self-contained interactive HTML document published at a permanent public URL via GitHub Pages.
+      <br><br>
+      The entire workflow — from brief to published URL — demonstrates how modern AI-assisted research pipelines can compress what traditionally takes a team of analysts several days into a coherent, credible, and visually polished deliverable produced in a fraction of the time.
+    </p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div><strong>Methodology Document</strong> &nbsp;|&nbsp; Kenya SME Tech Report &nbsp;|&nbsp; April 2026</div>
+  <div>Prepared with Claude AI · Anthropic</div>
+  <div>Confidential</div>
+</div>
+
+</body>
+</html>
